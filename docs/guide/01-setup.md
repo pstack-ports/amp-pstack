@@ -10,7 +10,7 @@ Clone the plugin into Amp's system plugin directory:
 git clone https://github.com/pstack-ports/amp-pstack ~/.config/amp/plugins/pstack
 ```
 
-Then reload plugins or start a new thread. The [README](../../README.md#install) covers the project and personal-repository installs.
+Then reload plugins or start a new thread. The [README](../../README.md#install) covers every install location.
 
 Amp prefixes plugin skills, so each command in this guide is `pstack:<name>` in Amp, such as `pstack:setup-pstack`. Name it in your message. The [Amp adapter](../../.agents/skills/poteto-mode/references/amp.md) covers the other differences.
 

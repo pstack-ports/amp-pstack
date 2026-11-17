@@ -18,17 +18,51 @@ fork it. improve it. make it yours. PRs are welcome!
 
 ## install
 
-pstack is a directory plugin. Install it on one machine by cloning it into Amp's system plugin directory:
+pstack is an Amp directory plugin: a `pstack/` directory with `index.ts` at its root. Amp loads plugins from four places. When two plugins share a name, a project plugin wins over a system plugin, which wins over a personal plugin, which wins over a workspace plugin.
+
+| Where | Applies to | Works for pstack |
+| --- | --- | --- |
+| [System plugin directory](#system-this-machine) | every project on one machine | yes |
+| [Project plugin directory](#project-one-repository) | one repository, on every machine and orb that checks it out | yes |
+| [Personal plugins repository](#personal-or-workspace-plugins-repository) | you, everywhere you use Amp | not yet: over the 500-file limit |
+| [Workspace plugins repository](#personal-or-workspace-plugins-repository) | everyone in your Amp workspace | not yet: over the 500-file limit |
+
+`amp plugins add <url>` installs only a single-file plugin, so it cannot install pstack.
+
+### System: this machine
+
+Clone pstack into Amp's system plugin directory. If `XDG_CONFIG_HOME` is set, use `$XDG_CONFIG_HOME/amp/plugins/pstack` instead.
 
 ```bash
 git clone https://github.com/pstack-ports/amp-pstack ~/.config/amp/plugins/pstack
 ```
 
-Or commit it to one project at `.amp/plugins/pstack/`, which also loads it in that project's orb threads. Hosted personal and workspace plugin repositories load at most 500 files per directory plugin and pstack ships more, and `amp plugins add` takes a single-file URL, so neither can install pstack.
+To update, run `git pull` in that directory. Use a real directory: a symlink to a checkout elsewhere does not load.
 
-Reload plugins (`plugins: reload` in the command palette) or start a new thread. `amp skill list` then shows the skills as `pstack:<name>`, such as `pstack:poteto-mode`. Use that name where this readme and the guide say `/poteto-mode`, for example "use pstack:poteto-mode to fix …".
+### Project: one repository
 
-Skills marked `disable-model-invocation` upstream are registered unlisted, so they stay out of the skill list Amp shows the model. They load only when you name them or another pstack skill routes to them. To update, `git pull` in the plugin directory and reload.
+Copy pstack into the repository's `.amp/plugins/` directory without its Git history, then commit it. Teammates and the repository's orb threads get it from the checkout.
+
+```bash
+git clone --depth 1 https://github.com/pstack-ports/amp-pstack .amp/plugins/pstack
+rm -rf .amp/plugins/pstack/.git
+git add .amp/plugins/pstack
+git commit -m "Add pstack Amp plugin"
+```
+
+To update, repeat the copy over the existing directory and commit the result.
+
+### Personal or workspace plugins repository
+
+Amp keeps personal and workspace plugins in hosted Git repositories, so they load in every thread you or your workspace run, including orbs. A personal plugin is the setup Amp recommends, and only workspace admins can write the workspace repository.
+
+These repositories load a directory plugin only if it has at most 500 files. pstack has about 560, most of them statechart test fixtures, so Amp accepts the push but does not load the plugin. Use a system or project install until pstack fits. Once it does, ask Amp in a thread, such as "add the pstack plugin from github.com/pstack-ports/amp-pstack to my personal plugins", or do it by hand: run `amp clone user-plugins` (or `amp clone workspace-plugins`), copy pstack into a `pstack/` directory without its `.git`, then commit and push. `amp plugins repositories` lists the repositories and whether you can write them.
+
+### After installing
+
+Reload plugins (`plugins: reload` in the command palette) or start a new thread. `amp plugins list` shows `pstack/index.ts` as active, and `amp skill list` shows the skills as `pstack:<name>`, such as `pstack:poteto-mode`. Use that name where this readme and the guide say `/poteto-mode`, for example "use pstack:poteto-mode to fix …".
+
+Skills marked `disable-model-invocation` upstream are registered unlisted, so they stay out of the skill list Amp shows the model. They load only when you name them or another pstack skill routes to them.
 
 The workflows need Amp's `Task` subagents; `create_thread` and orbs back the cloud-worker steps, and schedules back `/loop`. Runtime helpers require Bun; forge workflows need authenticated `gh`. UI, Slack, issue-tracker, and event-driven workflows check their external prerequisites before acting.
 
